@@ -2,16 +2,17 @@ package com.flowerhop.kotlinandroidprac
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatCheckBox
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    private var todos = listOf<Todo>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -20,28 +21,30 @@ class MainActivity : AppCompatActivity() {
         todoList.adapter = adapter
         todoList.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         todoList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        adapter.refresh(listOf<Todo>(
-            Todo.Title("Title 1"),
-            Todo.Item("todoItem 1", true),
-            Todo.Item("todoItem 2", true),
-            Todo.Item("todoItem 3", true),
-            Todo.Item("todoItem 4", true),
-            Todo.Title("Title 2"),
-            Todo.Item("todoItem 5", true),
-            Todo.Item("todoItem 6", true),
-            Todo.Item("todoItem 7", true),
-            Todo.Item("todoItem 8", true),
-            Todo.Item("todoItem 8", true),
-            Todo.Item("todoItem 9", true),
-            Todo.Item("todoItem 10", true),
-            Todo.Item("todoItem 11", true),
-            Todo.Item("todoItem 12", true),
-        ))
+        todos = todos.toMutableList().apply {
+            add(Todo.Title("Title"))
+        }
+
+        adapter.submitList(todos)
+        button.setOnClickListener {
+            todos = todos.toMutableList().apply {
+                add(Todo.Item("New Item ${System.currentTimeMillis()}", false))
+            }
+            adapter.submitList(todos)
+        }
     }
 }
 
-class TodoListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    var todos = listOf<Todo>()
+class TodoListAdapter: ListAdapter<Todo, RecyclerView.ViewHolder>(
+    object : DiffUtil.ItemCallback<Todo>() {
+        override fun areItemsTheSame(oldItem: Todo, newItem: Todo): Boolean {
+            return oldItem.viewType == newItem.viewType
+        }
+
+        override fun areContentsTheSame(oldItem: Todo, newItem: Todo): Boolean {
+            return oldItem == newItem
+        }
+}) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             Todo.VIEW_TYPE_TITLE -> TodoTitleViewHolder(parent)
@@ -50,22 +53,14 @@ class TodoListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        return todos[position].viewType
+        return getItem(position).viewType
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val todo = todos[position]) {
+        when (val todo = this.getItem(position)) {
             is Todo.Title -> (holder as TodoTitleViewHolder).bind(todo)
             is Todo.Item -> (holder as TodoItemViewHolder).bind(todo)
         }
-    }
-
-    override fun getItemCount(): Int {
-        return todos.size
-    }
-
-    fun refresh(todos: List<Todo>) {
-        this.todos = todos
     }
 }
 
