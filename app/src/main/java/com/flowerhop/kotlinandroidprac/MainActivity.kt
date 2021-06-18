@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
@@ -23,11 +24,10 @@ class MainActivity : AppCompatActivity() {
         todoList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
         val todoViewModel = ViewModelProvider(this).get(TodoViewModel::class.java)
-        adapter.submitList(todoViewModel.todos)
+        todoViewModel.todosLiveData.observe(this, Observer { todos: List<Todo> -> adapter.submitList(todos) })
 
         button.setOnClickListener {
             todoViewModel.addTodo("Item")
-            adapter.submitList(todoViewModel.todos)
         }
     }
 }
