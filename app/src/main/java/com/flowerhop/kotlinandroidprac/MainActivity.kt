@@ -7,12 +7,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    private var todos = listOf<Todo>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -21,16 +21,13 @@ class MainActivity : AppCompatActivity() {
         todoList.adapter = adapter
         todoList.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         todoList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        todos = todos.toMutableList().apply {
-            add(Todo.Title("Title"))
-        }
 
-        adapter.submitList(todos)
+        val todoViewModel = ViewModelProvider(this).get(TodoViewModel::class.java)
+        adapter.submitList(todoViewModel.todos)
+
         button.setOnClickListener {
-            todos = todos.toMutableList().apply {
-                add(Todo.Item("New Item ${System.currentTimeMillis()}", false))
-            }
-            adapter.submitList(todos)
+            todoViewModel.addTodo("Item")
+            adapter.submitList(todoViewModel.todos)
         }
     }
 }
