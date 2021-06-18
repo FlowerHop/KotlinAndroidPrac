@@ -1,21 +1,23 @@
 package com.flowerhop.kotlinandroidprac
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class TodoViewModel:ViewModel() {
-    val todosLiveData = MutableLiveData<List<Todo>>(
-        mutableListOf(Todo.Title("Title"))
-    )
+    val addTodoIntent = MutableLiveData<String>()
+    val todosLiveData = MediatorLiveData<List<Todo>>().apply {
+        addSource(addTodoIntent) {
+            val list = value!!.toMutableList().apply {
+                add(Todo.Item("${addTodoIntent.value} - $count", false))
+                count++
+            }
 
-    var count = 0;
-
-    fun addTodo(name: String) {
-        val list = todosLiveData.value!!.toMutableList().apply {
-            add(Todo.Item("$name - $count", false))
-            count++
+            value = list
         }
 
-        todosLiveData.postValue(list)
+        value = mutableListOf(Todo.Title("Title"))
     }
+
+    private var count = 0;
 }

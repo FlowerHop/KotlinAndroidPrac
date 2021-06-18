@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         todoViewModel.todosLiveData.observe(this, Observer { todos: List<Todo> -> adapter.submitList(todos) })
 
         button.setOnClickListener {
-            todoViewModel.addTodo("Item")
+            todoViewModel.addTodoIntent.postValue("Item")
         }
     }
 }
