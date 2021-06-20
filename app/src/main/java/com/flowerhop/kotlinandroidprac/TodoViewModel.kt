@@ -9,8 +9,7 @@ class TodoViewModel:ViewModel() {
     val todosLiveData = MediatorLiveData<List<Todo>>().apply {
         addSource(addTodoIntent) {
             val list = value!!.toMutableList().apply {
-                add(Todo.Item("${addTodoIntent.value} - $count", false))
-                count++
+                add(Todo.Item("${addTodoIntent.value}", false))
             }
 
             value = list
@@ -18,6 +17,4 @@ class TodoViewModel:ViewModel() {
 
         value = mutableListOf(Todo.Title("Title"))
     }
-
-    private var count = 0;
 }
