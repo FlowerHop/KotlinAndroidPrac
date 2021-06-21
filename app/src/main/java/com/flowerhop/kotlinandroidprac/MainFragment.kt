@@ -27,7 +27,7 @@ class MainFragment: Fragment(R.layout.fragment_main) {
         todoViewModel.todosLiveData.observe(viewLifecycleOwner, Observer { todos: List<Todo> -> adapter.submitList(todos) })
 
         button.setOnClickListener {
-            findNavController().navigate(R.id.action_mainFragment_to_addTodoFragment)
+            findNavController().navigate(MainFragmentDirections.actionMainFragmentToAddTodoFragment("Memo"))
         }
     }
 }

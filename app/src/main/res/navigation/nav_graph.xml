@@ -18,5 +18,15 @@
         android:id="@+id/addTodoFragment"
         android:name="com.flowerhop.kotlinandroidprac.AddTodoFragment"
         android:label="AddTodoFragment" >
+
+        <argument
+            android:name="memo"
+            app:nullable="true"
+            app:argType="string"
+            android:defaultValue="This is an EditText."/>
+
+        <action
+            android:id="@+id/action_addTodoFragment_to_mainFragment"
+            app:popUpTo="@id/mainFragment" />
     </fragment>
 </navigation>
