@@ -1,20 +1,36 @@
 package com.flowerhop.kotlinandroidprac
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.flowerhop.kotlinandroidprac.database.TodoItem
+import kotlinx.coroutines.launch
+import java.util.*
 
-class TodoViewModel:ViewModel() {
-    val addTodoIntent = MutableLiveData<String>()
+class TodoViewModel(val todoItemRepository: TodoItemRepository) :ViewModel() {
+    private val title = Todo.Title("This is a title")
     val todosLiveData = MediatorLiveData<List<Todo>>().apply {
-        addSource(addTodoIntent) {
-            val list = value!!.toMutableList().apply {
-                add(Todo.Item("${addTodoIntent.value}", false))
+        val source = todoItemRepository.getTodoItems().map {
+            it.map { todoItem ->
+                Todo.Item(
+                    todoItem.id,
+                    todoItem.title,
+                    todoItem.done,
+                    todoItem.createdAt
+                )
             }
+        }
 
-            value = list
+        addSource(source) {
+            this.value = mutableListOf(title) + it
+            value = mutableListOf(title)
         }
 
         value = mutableListOf(Todo.Title("Title"))
+    }
+
+    fun createNewTodo(title: String) {
+        val todoItem = TodoItem(title, false, Date())
+        viewModelScope.launch {
+            todoItemRepository.insertTodoItem(todoItem)
+        }
     }
 }

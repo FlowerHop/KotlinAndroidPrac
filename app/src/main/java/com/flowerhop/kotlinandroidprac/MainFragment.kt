@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.flowerhop.kotlinandroidprac.database.AppDatabase
+import com.flowerhop.kotlinandroidprac.mvvm.AnyViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_main.*
 
@@ -23,7 +25,12 @@ class MainFragment: Fragment(R.layout.fragment_main) {
         todoList.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
         todoList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
-        val todoViewModel = ViewModelProvider(requireActivity()).get(TodoViewModel::class.java)
+        val todoItemDB = AppDatabase.getInstance(requireContext().applicationContext)
+        val todoItemRepository = TodoItemRepository(todoItemDB)
+        val todoViewModelFactory = AnyViewModelFactory{
+            TodoViewModel(todoItemRepository)
+        }
+        val todoViewModel = ViewModelProvider(requireActivity(), todoViewModelFactory).get(TodoViewModel::class.java)
         todoViewModel.todosLiveData.observe(viewLifecycleOwner, Observer { todos: List<Todo> -> adapter.submitList(todos) })
 
         button.setOnClickListener {

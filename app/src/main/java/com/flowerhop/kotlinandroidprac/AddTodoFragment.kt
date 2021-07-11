@@ -7,15 +7,22 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.flowerhop.kotlinandroidprac.database.AppDatabase
+import com.flowerhop.kotlinandroidprac.mvvm.AnyViewModelFactory
 import kotlinx.android.synthetic.main.fragment_add_todo.*
 
 class AddTodoFragment: Fragment(R.layout.fragment_add_todo) {
     private val args by navArgs<AddTodoFragmentArgs>()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val todoViewModel = ViewModelProvider(requireActivity()).get(TodoViewModel::class.java)
+        val todoItemDB = AppDatabase.getInstance(requireContext().applicationContext)
+        val todoItemRepository = TodoItemRepository(todoItemDB)
+        val todoViewModelFactory = AnyViewModelFactory {
+            TodoViewModel(todoItemRepository)
+        }
+        val todoViewModel = ViewModelProvider(requireActivity(), todoViewModelFactory).get(TodoViewModel::class.java)
         editText.setText(args.memo)
-        editText.setSelection(args.memo.length)
+        editText.setSelection(args.memo!!.length)
         btnSubmit.setOnClickListener {
             val text = editText.text
             if (text.isNullOrBlank()) {
@@ -24,7 +31,7 @@ class AddTodoFragment: Fragment(R.layout.fragment_add_todo) {
                 return@setOnClickListener
             }
 
-            todoViewModel.addTodoIntent.postValue(text.toString())
+            todoViewModel.createNewTodo(text.toString())
             findNavController().popBackStack()
         }
     }
