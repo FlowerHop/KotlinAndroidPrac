@@ -21,7 +21,6 @@ class TodoViewModel(val todoItemRepository: TodoItemRepository) :ViewModel() {
 
         addSource(source) {
             this.value = mutableListOf(title) + it
-            value = mutableListOf(title)
         }
 
         value = mutableListOf(Todo.Title("Title"))
@@ -31,6 +30,17 @@ class TodoViewModel(val todoItemRepository: TodoItemRepository) :ViewModel() {
         val todoItem = TodoItem(title, false, Date())
         viewModelScope.launch {
             todoItemRepository.insertTodoItem(todoItem)
+        }
+    }
+
+    fun updateTodo(todo: Todo.Item) {
+        val todoItem = TodoItem(
+            todo.text,
+            done = todo.checked,
+            createdAt = todo.createdAt
+        ).apply { id = todo.id }
+        viewModelScope.launch {
+            todoItemRepository.updateTodoItem(todoItem)
         }
     }
 }

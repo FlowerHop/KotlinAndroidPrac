@@ -20,10 +20,6 @@ class MainFragment: Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = TodoListAdapter()
-        todoList.adapter = adapter
-        todoList.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
-        todoList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         val todoItemDB = AppDatabase.getInstance(requireContext().applicationContext)
         val todoItemRepository = TodoItemRepository(todoItemDB)
@@ -31,7 +27,18 @@ class MainFragment: Fragment(R.layout.fragment_main) {
             TodoViewModel(todoItemRepository)
         }
         val todoViewModel = ViewModelProvider(requireActivity(), todoViewModelFactory).get(TodoViewModel::class.java)
+        val adapter = TodoListAdapter().apply {
+            onTouchChangeListener = object : OnTouchChangeListener {
+                override fun onChange(todo: Todo.Item) {
+                    todoViewModel.updateTodo(todo)
+                }
+            }
+        }
+
         todoViewModel.todosLiveData.observe(viewLifecycleOwner, Observer { todos: List<Todo> -> adapter.submitList(todos) })
+        todoList.adapter = adapter
+        todoList.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
+        todoList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         button.setOnClickListener {
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToAddTodoFragment("Memo"))

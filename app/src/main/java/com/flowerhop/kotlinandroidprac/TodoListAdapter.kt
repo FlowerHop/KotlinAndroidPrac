@@ -18,9 +18,11 @@ class TodoListAdapter: ListAdapter<Todo, RecyclerView.ViewHolder>(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             Todo.VIEW_TYPE_TITLE -> TodoTitleViewHolder(parent)
-            else -> TodoItemViewHolder(parent)
+            else -> TodoItemViewHolder(parent, onTouchChangeListener)
         }
     }
+
+    var onTouchChangeListener: OnTouchChangeListener? = null
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position).viewType
