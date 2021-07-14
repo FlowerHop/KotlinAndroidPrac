@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.flowerhop.kotlinandroidprac.database.AppDatabase
 import com.flowerhop.kotlinandroidprac.mvvm.AnyViewModelFactory
+import com.flowerhop.kotlinandroidprac.repository.TodoItemRepository
 import kotlinx.android.synthetic.main.fragment_add_todo.*
 
 class AddTodoFragment: Fragment(R.layout.fragment_add_todo) {

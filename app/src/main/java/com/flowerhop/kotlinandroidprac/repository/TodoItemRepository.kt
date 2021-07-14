@@ -1,4 +1,4 @@
-package com.flowerhop.kotlinandroidprac
+package com.flowerhop.kotlinandroidprac.repository
 
 import androidx.lifecycle.LiveData
 import com.flowerhop.kotlinandroidprac.database.AppDatabase

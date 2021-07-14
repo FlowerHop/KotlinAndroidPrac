@@ -1,10 +1,8 @@
 package com.flowerhop.kotlinandroidprac
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,8 +11,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flowerhop.kotlinandroidprac.database.AppDatabase
 import com.flowerhop.kotlinandroidprac.mvvm.AnyViewModelFactory
-import kotlinx.android.synthetic.main.activity_main.*
+import com.flowerhop.kotlinandroidprac.network.ApiClient
+import com.flowerhop.kotlinandroidprac.repository.TodoItemRepository
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainFragment: Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,6 +45,13 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
         button.setOnClickListener {
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToAddTodoFragment("Memo"))
+        }
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val gson = Gson()
+            val apiClient = ApiClient()
+            val userNames = apiClient.listUser().map {it.lastName}
+            activity?.run { Toast.makeText(this, userNames.joinToString(", "), Toast.LENGTH_LONG).show() }
         }
     }
 }
